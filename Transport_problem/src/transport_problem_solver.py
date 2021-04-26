@@ -33,7 +33,7 @@ class Solver:
                 if type(sym) == str:
                     print(" " * 6 + sym, end="")
                 else:
-                    print("{0:7.1g}".format(sym), end=""),
+                    print("{0:7.0f}".format(sym), end=""),
             print()
         print("_" * 7 * len(self.volumes_matrix[0]))
 
@@ -143,7 +143,7 @@ class Solver:
         if start == finish:
             return True, cycle_path
         for v in graph[start]:
-            if not v in cycle_path:
+            if v not in cycle_path:
                 res = self.dfs(graph, v, finish, cycle_path)
                 if res[0]:
                     return res
@@ -155,7 +155,8 @@ class Solver:
         current_graph = self.create_graph(_coords_list)
         path = self.dfs(current_graph, max_from_deltas[0] - self.dimension[0], max_from_deltas[1], [])[1]
         cycle = [max_from_deltas]
-        cycle.extend([(path[i] + self.dimension[0], path[i+1]) if i % 2 == 0 else (path[i+1] + self.dimension[0], path[i]) for i in range(len(path) - 1)])
+        cycle.extend([(path[i] + self.dimension[0], path[i + 1])
+                      if i % 2 == 0 else (path[i + 1] + self.dimension[0], path[i]) for i in range(len(path) - 1)])
         return cycle
 
     def potential_method(self):
