@@ -79,5 +79,6 @@ b_eq_ = [9, 5, 12, 6, 4, 5, 4, 9, 5, 5]
 
 
 def solve_simplex_method(c: list, A: list, b: list):
-    result = linprog(c, A_ub=A, b_ub=b, method='simplex', bounds=(None, None))
+    result = linprog(c, A_ub=A, b_ub=b, method='simplex', bounds=(None, None), options={'tol': 10**-12})
+    # , options={'tol': 10**-12}
     return result
