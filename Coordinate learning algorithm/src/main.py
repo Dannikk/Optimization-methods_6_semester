@@ -16,10 +16,10 @@ def get_probabilities(w: np.array, dim: int) -> np.array:
     return p
 
 
-def update_w(w: np.array, u1: np.array, u2: np.array, func, dim: int, beta: float) -> np.array:
+def update_w(w: np.array, u1: np.array, u2: np.array, func, dim: int, beta: float, delta: float) -> np.array:
     w_new = np.empty(dim)
     for i, w_i, u1_i, u2_i in enumerate(zip(w, u1, u2)):
-        w_new[i] = beta * w_i - np.sign(func(u1) - func(u2) * (u1_i - u2_i))
+        w_new[i] = beta * w_i - delta * np.sign(func(u1) - func(u2) * (u1_i - u2_i))
 
 
 def get_vector_epsilon(p: np.array, dim: int) -> np.array:
