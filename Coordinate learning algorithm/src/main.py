@@ -2,6 +2,7 @@ import numpy as np
 from src.func_utils import func, func_rosenbrock
 import random
 from numpy.linalg import norm
+import matplotlib.pyplot as plt
 
 INIT_PROB = 0.5
 
@@ -54,6 +55,7 @@ def get_vector_xi(p: np.array, dim: int) -> np.array:
     for i, p_i in enumerate(p):
         random.seed()
         xi[i] = random.choices([-1, 1], weights=[1 - p_i, p_i], k=1)[0]
+    xi /= norm(xi)
     return xi
 
 
@@ -68,34 +70,70 @@ def main(function, dim: int, beta: float, delta: float, alpha: float, c: float, 
     c:
     beta : coefficient забывания
     """
-    x_1 = np.random.uniform(0, 1, dim)
-    print("x[1] = " + str(x_1))
-    print("f(x) = ", func(x_1))
+
+    fig = plt.figure(figsize=(12, 7))
+    plt.grid()
+    x__ = []
+    y__ = []
+
+    # x_1 = np.random.uniform(0, 1, dim)
+    x_1 = np.array([0.1, 0.1])
+    print("x[0] = " + str(x_1))
+    # print("f(x) = ", func(x_1))
+    x__.append(x_1[0])
+    y__.append(x_1[1])
 
     w_1 = np.zeros(dim)
+    print("w_0 = ", w_1)
     p = get_probability_vector(w_1, dim)
+    print("Probabilities vector = ", p)
     xi_vector = get_vector_xi(p, dim)
-
-    x_2 = x_1 + alpha * xi_vector
-    print("x[2] = " + str(x_2))
     print("xi = " + str(xi_vector))
-    print("f(x) = ", func(x_2))
+    x_2 = x_1 + alpha * xi_vector
 
+    print("x[1] = " + str(x_2))
+    print("______________________________")
+    # print("f(x) = ", func(x_2))
+    x__.append(x_2[0])
+    y__.append(x_2[1])
+    x_k = x_2
+    x_prev = x_1
     k = 3
     while True:
-        x_k = x_2 + alpha * xi_vector
-        alpha *= 0.9
-        print("x[" + str(k) + "] = " + str(x_k))
-        print("xi = " + str(xi_vector))
-        print("f(x) = ", func(x_k))
-        w_k = update_w(w_1, x_2, x_1, function, dim, beta, delta, c)
+        # x_k = x_2 + alpha * xi_vector
+        w_k = update_w(w_1, x_k, x_prev, function, dim, beta, delta, c)
+        print("w_k = ", w_k)
         p = get_probability_vector(w_k, dim)
+        print("Probabilities vector = ", p)
         xi_vector = get_vector_xi(p, dim)
-        x_2, x_1 = x_k, x_2
+        print("xi = " + str(xi_vector))
+        x_prev = x_k
+        x_k = x_prev + alpha * xi_vector
+
+        print("x[" + str(k-1) + "] = " + str(x_k))
+        print("______________________________")
+
+        # print("f(x) = ", func(x_k))
+
+        x__.append(x_k[0])
+        y__.append(x_k[1])
+        # x_2, x_1 = x_k, x_2
         w_1 = w_k
-        if norm(x_2 - x_1) < epsilon:
+        if func(x_k) < func(x_prev):
+            alpha *= 1.1
+        else:
+            alpha *= 0.65
+
+        if norm(x_k - x_prev) < epsilon:
+            ll = [str(i) for i in range(0, k)]
+            plt.plot(np.array(x__), np.array(y__), "-o")
+            ii = 0
+            for x, y in zip(x__, y__):
+                plt.text(x, y, str(ii), color='r')
+                ii += 1
+            plt.show()
             break
         k += 1
 
 
-main(func, 2, 2, 1, 0.9, 0.8, 0.001)
+main(func, dim=2, beta=0.5, delta=1.8, alpha=0.2, c=10, epsilon=0.1)
